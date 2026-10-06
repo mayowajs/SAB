@@ -1,0 +1,94 @@
+.card-wrap {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 380px;
+  height: 220px;
+  margin-bottom: 32px;
+  cursor: pointer;
+}
+
+.card-inner {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%; height: 100%;
+  border-radius: 18px;
+  backface-visibility: hidden;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-front {
+  background: linear-gradient(135deg, #111 0%, #333 100%);
+  color: #fff;
+}
+
+.card-back {
+  background: linear-gradient(135deg, #333 0%, #111 100%);
+  color: #fff;
+  transform: rotateY(180deg);
+}
+
+.card-chip { font-size: 26px; }
+.card-number { font-size: 15px; letter-spacing: 3px; font-weight: 600; word-break: break-all; }
+.card-bottom { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 6px; }
+.card-name { font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+.card-expiry { font-size: 11px; color: #aaa; }
+.card-expiry span { display: block; font-size: 13px; color: #fff; font-weight: 600; }
+.card-bank { font-size: 16px; font-weight: 800; }
+
+.card-back-strip {
+  background: #000;
+  height: 44px;
+  margin: 0 -28px;
+  margin-top: 10px;
+}
+
+.card-cvv-wrap { text-align: right; }
+.card-cvv-label { font-size: 11px; color: #aaa; }
+.card-cvv {
+  background: #fff;
+  color: #111;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  display: inline-block;
+  margin-top: 4px;
+  letter-spacing: 3px;
+}
+
+.card-hint { font-size: 12px; color: #888; margin-bottom: 20px; }
+
+.card-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  max-width: 500px;
+}
+
+.card-detail-item {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.card-detail-item label { font-size: 11px; color: #888; display: block; margin-bottom: 4px; }
+.card-detail-item p { font-size: 14px; font-weight: 700; word-break: break-all; }
+
+@media (max-width: 480px) {
+  .card-wrap { height: 190px; }
+  .card-front, .card-back { padding: 18px 20px; }
+  .card-number { font-size: 13px; letter-spacing: 2px; }
+  .card-details-grid { grid-template-columns: 1fr 1fr; }
+}

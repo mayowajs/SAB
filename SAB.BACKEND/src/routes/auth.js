@@ -1,0 +1,232 @@
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const multer = require('multer');
+const path = require('path');
+const User = require('../models/User');
+const auth = require('../middleware/auth');
+const { isValidEmail, isValidName, isValidPassword } = require('../utils/validation');
+const router = express.Router();
+
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, '../uploads'),
+  filename: (req, file, cb) => cb(null, `${req.user?.id || Date.now()}${path.extname(file.originalname)}`),
+});
+const upload = multer({ storage, limits: { fileSize: 2 * 1024 * 1024 } });
+
+router.post('/register', async (req, res) => {
+  try {
+    const { fullName, password } = req.body;
+    const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+    if (!isValidName(fullName) || !isValidEmail(email) || !isValidPassword(password)) {
+      return res.status(400).json({ message: 'Enter a valid name, email, and password of at least 8 characters' });
+    }
+    const user = await User.create({ fullName: fullName.trim(), email, password });
+    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.status(201).json({
+      token,
+      user: { id: user._id, fullName: user.fullName, email: user.email, accountNumber: user.accountNumber, balance: user.balance, isAdmin: user.isAdmin },
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Hardcoded admin login
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+      const token = jwt.sign({ id: 'admin', isAdmin: true }, process.env.JWT_SECRET, { expiresIn: '7d' });
+      return res.json({
+        token,
+        user: { id: 'admin', fullName: 'SAB Admin', email: process.env.ADMIN_EMAIL, accountNumber: '0000000000', balance: 0, isAdmin: true },
+      });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user || !(await bcrypt.compare(password, user.password)))
+      return res.status(400).json({ message: 'Invalid credentials' });
+    if (user.isFrozen)
+      return res.status(403).json({ message: 'Your account has been frozen. Contact support.' });
+    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    res.json({
+      token,
+      user: { id: user._id, fullName: user.fullName, email: user.email, accountNumber: user.accountNumber, balance: user.balance, isAdmin: user.isAdmin, hasPin: !!user.transactionPin },
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.patch('/profile', auth, async (req, res) => {
+  try {
+    const { fullName, email } = req.body;
+    const user = await User.findByIdAndUpdate(req.user.id, { fullName, email }, { new: true }).select('-password');
+    res.json({ user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.patch('/password', auth, async (req, res) => {
+  try {
+    const { current, newPass } = req.body;
+    if (!isValidPassword(newPass))
+      return res.status(400).json({ message: 'Password must be between 8 and 128 characters' });
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!(await bcrypt.compare(current, user.password)))
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    user.password = newPass;
+    await user.save();
+    res.json({ message: 'Password updated' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.delete('/account', auth, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user.id);
+    res.json({ message: 'Account deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Send a single-use password reset token without revealing whether the email exists.
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+    if (!isValidEmail(email)) return res.status(400).json({ message: 'Enter a valid email address' });
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(503).json({ message: 'Password reset is unavailable' });
+    }
+
+    const user = await User.findOne({ email });
+    const responseMessage = 'If the account exists, its local demo reset link is shown in the backend terminal.';
+    if (!user) return res.json({ message: responseMessage });
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    user.passwordResetTokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000);
+    await user.save();
+
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/forgot-password?token=${resetToken}`;
+    console.info(`Local demo password reset link: ${resetUrl}`);
+    res.json({ message: responseMessage });
+  } catch (err) {
+    res.status(500).json({ message: 'Unable to start password reset right now' });
+  }
+});
+
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (typeof token !== 'string' || !/^[a-f0-9]{64}$/i.test(token) || !isValidPassword(newPassword)) {
+      return res.status(400).json({ message: 'Reset link is invalid or expired' });
+    }
+
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const user = await User.findOne({
+      passwordResetTokenHash: tokenHash,
+      passwordResetExpires: { $gt: new Date() },
+    }).select('+passwordResetTokenHash +passwordResetExpires');
+
+    if (!user) return res.status(400).json({ message: 'Reset link is invalid or expired' });
+
+    user.password = newPassword;
+    user.passwordResetTokenHash = null;
+    user.passwordResetExpires = null;
+    await user.save();
+    res.json({ message: 'Password reset successful' });
+  } catch (err) {
+    res.status(500).json({ message: 'Unable to reset password right now' });
+  }
+});
+
+router.post('/upload-photo', auth, upload.single('photo'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    const photoUrl = `/uploads/${req.file.filename}`;
+    await User.findByIdAndUpdate(req.user.id, { photo: photoUrl });
+    res.json({ photoUrl });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.get('/beneficiaries', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('beneficiaries');
+    res.json(user.beneficiaries || []);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.post('/beneficiaries', auth, async (req, res) => {
+  try {
+    const { fullName, accountNumber } = req.body;
+    const user = await User.findById(req.user.id);
+    const exists = user.beneficiaries.find((b) => b.accountNumber === accountNumber);
+    if (exists) return res.status(400).json({ message: 'Beneficiary already saved' });
+    user.beneficiaries.push({ fullName, accountNumber });
+    await user.save();
+    res.json(user.beneficiaries);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.delete('/beneficiaries/:accountNumber', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    user.beneficiaries = user.beneficiaries.filter((b) => b.accountNumber !== req.params.accountNumber);
+    await user.save();
+    res.json({ message: 'Removed' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.post('/set-pin', auth, async (req, res) => {
+  try {
+    const { pin } = req.body;
+    if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin))
+      return res.status(400).json({ message: 'PIN must be exactly 4 digits' });
+    const hashed = await bcrypt.hash(pin, 10);
+    await User.findByIdAndUpdate(req.user.id, { transactionPin: hashed });
+    res.json({ message: 'PIN set successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.post('/verify-pin', auth, async (req, res) => {
+  try {
+    const { pin } = req.body;
+    const user = await User.findById(req.user.id);
+    if (!user.transactionPin) return res.status(400).json({ message: 'No PIN set. Please set a PIN first.' });
+    const match = await bcrypt.compare(pin, user.transactionPin);
+    if (!match) return res.status(400).json({ message: 'Incorrect PIN' });
+    res.json({ valid: true });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.get('/me', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ user: { id: user._id, fullName: user.fullName, email: user.email, accountNumber: user.accountNumber, balance: user.balance, isAdmin: user.isAdmin, photo: user.photo || null, hasPin: !!user.transactionPin } });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+module.exports = router;

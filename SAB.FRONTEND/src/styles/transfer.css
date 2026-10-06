@@ -1,0 +1,182 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.modal-subtitle {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 24px;
+}
+
+.modal-amount {
+  text-align: center;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -2px;
+  margin: 20px 0;
+  color: #111;
+}
+
+.modal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 14px;
+}
+
+.modal-row:last-of-type { border-bottom: none; }
+.modal-row label { color: #999; }
+.modal-row span { font-weight: 700; }
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-actions button { flex: 1; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 700; }
+.btn-cancel { background: #f5f5f5; color: #111; }
+.btn-cancel:hover { background: #e0e0e0; opacity: 1; }
+
+/* Receipt modal */
+.receipt-icon {
+  width: 64px; height: 64px;
+  background: #f0fff4;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 16px;
+}
+
+.receipt-ref {
+  text-align: center;
+  font-size: 11px;
+  color: #bbb;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* Recipient preview */
+.recipient-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 8px;
+}
+
+.recipient-avatar {
+  width: 38px; height: 38px;
+  background: #111;
+  color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.recipient-name { font-size: 14px; font-weight: 700; }
+.recipient-acc { font-size: 12px; color: #999; margin-top: 2px; }
+
+/* Transfer stats */
+.transfer-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.transfer-stat {
+  background: #fff;
+  border: 1px solid #ebebeb;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.transfer-stat label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+.transfer-stat p { font-size: 20px; font-weight: 800; }
+.transfer-stat p.sent-color { color: #e53e3e; }
+.transfer-stat p.received-color { color: #38a169; }
+
+/* Transfer tabs */
+.transfer-tabs {
+  display: flex;
+  gap: 0;
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  max-width: 500px;
+}
+
+.transfer-tabs button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  background: transparent;
+  color: #888;
+  border: none;
+  transition: all 0.2s;
+}
+
+.transfer-tabs button.active {
+  background: #111;
+  color: #fff;
+}
+
+.transfer-tabs button:hover:not(.active) {
+  color: #111;
+  opacity: 1;
+}
+
+/* Field helpers */
+.field-error { color: #e53e3e; font-size: 12px; margin-top: 6px; }
+.field-hint  { color: #999; font-size: 12px; margin-top: 6px; }
+
+/* Interbank notice */
+.interbank-notice {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #92400e;
+  margin-bottom: 16px;
+}
