@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { api } from '../api';
+import { API_BASE_URL, SERVER_BASE_URL, api } from '../api';
 import { Sidebar } from '../components/Sidebar';
 import '../styles/dashboard.css';
 import '../styles/settings.css';
@@ -40,7 +40,7 @@ export const Settings = () => {
     const formData = new FormData();
     formData.append('photo', file);
     const token = localStorage.getItem('sab_token');
-    const res = await fetch('http://localhost:5000/api/auth/upload-photo', {
+    const res = await fetch(`${API_BASE_URL}/auth/upload-photo`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -95,7 +95,7 @@ export const Settings = () => {
           <div className="settings-section" style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 20 }}>
             <div style={{ position: 'relative' }}>
               {user.photo ? (
-                <img src={`http://localhost:5000${user.photo}`} alt="profile"
+                <img src={`${SERVER_BASE_URL}${user.photo}`} alt="profile"
                   style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #ebebeb' }} />
               ) : (
                 <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#111', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, fontWeight: 700 }}>

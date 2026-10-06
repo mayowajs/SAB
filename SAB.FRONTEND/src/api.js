@@ -1,9 +1,10 @@
-﻿const BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
+﻿export const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
+export const SERVER_BASE_URL = API_BASE_URL.replace(/\/api$/, '');
 const getToken = () => localStorage.getItem('sab_token');
 
 const request = async (path, options = {}) => {
   const token = getToken();
-  const response = await fetch(`${BASE}${path}`, {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
       ...(options.headers || {}),

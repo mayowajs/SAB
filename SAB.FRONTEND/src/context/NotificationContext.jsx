@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+import { SERVER_BASE_URL } from '../api';
 import { useAuth } from './AuthContext';
 
 const NotificationContext = createContext();
@@ -10,7 +11,7 @@ export const NotificationProvider = ({ children }) => {
 
   useEffect(() => {
     if (!user?.id || user.isAdmin) return;
-    const socket = io('http://localhost:5000');
+    const socket = io(SERVER_BASE_URL);
     socket.emit('join', user.id);
     socket.on('notification', (data) => {
       setNotifications((prev) => [{ ...data, id: Date.now(), read: false }, ...prev]);

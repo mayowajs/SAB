@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { SERVER_BASE_URL } from '../api';
 import '../styles/dashboard.css';
 
 const navItems = [
@@ -28,7 +29,7 @@ export const Sidebar = () => {
 
         {user?.photo && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 8px', marginBottom: 20 }}>
-            <img src={`http://localhost:5000${user.photo}`} alt="profile"
+            <img src={`${SERVER_BASE_URL}${user.photo}`} alt="profile"
               style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '2px solid #333' }} />
             <div style={{ overflow: 'hidden' }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.fullName.split(' ')[0]}</p>

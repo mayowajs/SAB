@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../api';
+import { API_BASE_URL, api } from '../api';
 import { Sidebar } from '../components/Sidebar';
 import '../styles/dashboard.css';
 import '../styles/transfer.css';
@@ -50,7 +50,7 @@ export const Transactions = () => {
           <button
             onClick={async () => {
               const token = localStorage.getItem('sab_token');
-              const res = await fetch('http://localhost:5000/api/transactions/statement/pdf', {
+              const res = await fetch(`${API_BASE_URL}/transactions/statement/pdf`, {
                 headers: { Authorization: `Bearer ${token}` },
               });
               const blob = await res.blob();

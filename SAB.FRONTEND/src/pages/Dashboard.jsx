@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { SERVER_BASE_URL } from '../api';
 import { useNotifications } from '../context/NotificationContext';
 import { api } from '../api';
 import { Sidebar } from '../components/Sidebar';
@@ -65,7 +66,7 @@ export const Dashboard = () => {
             </div>
             {/* Profile Photo */}
             {user.photo && (
-              <img src={`http://localhost:5000${user.photo}`} alt="profile"
+              <img src={`${SERVER_BASE_URL}${user.photo}`} alt="profile"
                 style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', border: '2px solid #ebebeb' }} />
             )}
           </div>
