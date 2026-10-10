@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Landing } from './pages/Landing';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { Login } from './pages/Login';
@@ -27,6 +28,7 @@ const AdminRoute = ({ children }) => {
 
 export const App = () => {
   return (
+    <ThemeProvider>
     <AuthProvider>
       <ToastProvider>
       <NotificationProvider>
@@ -49,5 +51,6 @@ export const App = () => {
       </NotificationProvider>
       </ToastProvider>
     </AuthProvider>
+    </ThemeProvider>
   );
 }

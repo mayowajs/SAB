@@ -33,6 +33,12 @@
 .settings-row label { color: #888; font-size: 13px; flex-shrink: 0; }
 .settings-row p { font-weight: 600; text-align: right; word-break: break-all; }
 
+.appearance-description {
+  color: #888;
+  font-size: 13px;
+  margin: -6px 0 16px;
+}
+
 .toggle {
   width: 44px; height: 24px;
   background: #ccc;

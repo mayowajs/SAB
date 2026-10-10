@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useTheme } from '../context/ThemeContext';
 import { API_BASE_URL, SERVER_BASE_URL, api } from '../api';
 import { Sidebar } from '../components/Sidebar';
 import '../styles/dashboard.css';
@@ -11,6 +12,7 @@ import '../styles/auth.css';
 export const Settings = () => {
   const { user, updateUser, logout } = useAuth();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [form, setForm] = useState({ fullName: user.fullName, email: user.email });
   const [passwords, setPasswords] = useState({ current: '', newPass: '', confirm: '' });
@@ -110,6 +112,18 @@ export const Settings = () => {
                 {photoLoading ? 'Uploading...' : '📷 Change Photo'}
                 <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: 'none' }} disabled={photoLoading} />
               </label>
+            </div>
+          </div>
+          <div className="settings-section appearance-section">
+            <h3>Appearance</h3>
+            <p className="appearance-description">Choose how SAB looks on this device.</p>
+            <div className="field">
+              <label htmlFor="theme-preference">Theme</label>
+              <select id="theme-preference" value={theme} onChange={(e) => setTheme(e.target.value)}>
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
             </div>
           </div>
           {/* Profile */}

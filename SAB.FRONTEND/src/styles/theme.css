@@ -1,0 +1,242 @@
+html[data-theme="dark"] {
+  color-scheme: dark;
+  background: #17191c;
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] .layout,
+html[data-theme="dark"] .main,
+html[data-theme="dark"] .auth-page {
+  background: #17191c;
+  color: #e7e9ec;
+}
+
+html[data-theme="dark"] .page-title,
+html[data-theme="dark"] .section-header h3,
+html[data-theme="dark"] .settings-section h3,
+html[data-theme="dark"] .settings-row p,
+html[data-theme="dark"] .action-btn,
+html[data-theme="dark"] .auth-card,
+html[data-theme="dark"] .auth-card h2,
+html[data-theme="dark"] .auth-logo h1,
+html[data-theme="dark"] .auth-footer a,
+html[data-theme="dark"] .field label,
+html[data-theme="dark"] .tx-name,
+html[data-theme="dark"] .transfer-stat p,
+html[data-theme="dark"] .card-detail-item p,
+html[data-theme="dark"] .stat-card .stat-value,
+html[data-theme="dark"] .admin-table td {
+  color: #e7e9ec;
+}
+
+html[data-theme="dark"] .settings-section,
+html[data-theme="dark"] .section-card,
+html[data-theme="dark"] .action-btn,
+html[data-theme="dark"] .transfer-stat,
+html[data-theme="dark"] .auth-card,
+html[data-theme="dark"] .card-detail-item,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .admin-table-wrap,
+html[data-theme="dark"] .landing-nav,
+html[data-theme="dark"] .feature-card,
+html[data-theme="dark"] .hero-img-badge,
+html[data-theme="dark"] .modal {
+  background: #22262b;
+  border-color: #343a40;
+}
+
+html[data-theme="dark"] .settings-section h3,
+html[data-theme="dark"] .settings-row,
+html[data-theme="dark"] .tx-item,
+html[data-theme="dark"] .hero-stats,
+html[data-theme="dark"] .footer,
+html[data-theme="dark"] .admin-table th,
+html[data-theme="dark"] .admin-table td {
+  border-color: #343a40;
+}
+
+html[data-theme="dark"] .settings-row label,
+html[data-theme="dark"] .settings-row p,
+html[data-theme="dark"] .appearance-description,
+html[data-theme="dark"] .section-header a,
+html[data-theme="dark"] .tx-date,
+html[data-theme="dark"] .transfer-stat label,
+html[data-theme="dark"] .card-detail-item label,
+html[data-theme="dark"] .stat-card .stat-label,
+html[data-theme="dark"] .section-label,
+html[data-theme="dark"] .section-subtitle,
+html[data-theme="dark"] .step-desc,
+html[data-theme="dark"] .why-list li,
+html[data-theme="dark"] .auth-logo h1 span,
+html[data-theme="dark"] .auth-logo p,
+html[data-theme="dark"] .auth-card p.subtitle,
+html[data-theme="dark"] .auth-footer,
+html[data-theme="dark"] .field-hint {
+  color: #a1a8b0;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] .search-bar,
+html[data-theme="dark"] .balance-edit input {
+  background: #191c20;
+  border-color: #41474f;
+  color: #e7e9ec;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #858d96;
+}
+
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] select:focus,
+html[data-theme="dark"] textarea:focus {
+  border-color: #a1a8b0;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .nav-item.active {
+  background: #30363d;
+  color: #fff;
+}
+
+html[data-theme="dark"] .nav-item:hover,
+html[data-theme="dark"] .admin-table tr:hover td {
+  background: #2b3036;
+}
+
+html[data-theme="dark"] .bottom-nav {
+  background: #202429;
+  border-color: #343a40;
+}
+
+html[data-theme="dark"] .balance-card,
+html[data-theme="dark"] .btn-primary,
+html[data-theme="dark"] .tab-btn.active,
+html[data-theme="dark"] .btn-sm.save {
+  background: #30363d;
+}
+
+html[data-theme="dark"] .landing-nav-logo,
+html[data-theme="dark"] .landing-nav-links a,
+html[data-theme="dark"] .landing-nav-links a:hover,
+html[data-theme="dark"] .btn-outline,
+html[data-theme="dark"] .section-title,
+html[data-theme="dark"] .feature-title,
+html[data-theme="dark"] .step-title,
+html[data-theme="dark"] .hero-stat-value,
+html[data-theme="dark"] .modal-title,
+html[data-theme="dark"] .modal-row span {
+  color: #e7e9ec;
+}
+
+html[data-theme="dark"] .hero,
+html[data-theme="dark"] .how-it-works,
+html[data-theme="dark"] .features,
+html[data-theme="dark"] .why-sab {
+  background: #17191c;
+}
+
+html[data-theme="dark"] .hero-bg {
+  background: radial-gradient(ellipse at 70% 50%, #22262b 0%, #17191c 70%);
+}
+
+html[data-theme="dark"] .hero-title,
+html[data-theme="dark"] .landing-heading {
+  color: #e7e9ec;
+}
+
+html[data-theme="dark"] .hero-subtitle,
+html[data-theme="dark"] .feature-desc,
+html[data-theme="dark"] .hero-stat-label,
+html[data-theme="dark"] .modal-subtitle,
+html[data-theme="dark"] .modal-row label,
+html[data-theme="dark"] .receipt-ref {
+  color: #a1a8b0;
+}
+
+html[data-theme="dark"] .landing-nav {
+  background: rgba(34, 38, 43, 0.95);
+}
+
+html[data-theme="dark"] .btn-outline {
+  border-color: #a1a8b0;
+}
+
+html[data-theme="dark"] .btn-outline:hover {
+  background: #e7e9ec;
+  color: #17191c;
+}
+
+html[data-theme="dark"] .modal-card,
+html[data-theme="dark"] .modal-content {
+  background: #22262b;
+  color: #e7e9ec;
+}
+
+html[data-theme="dark"] .hero-badge,
+html[data-theme="dark"] .action-icon-wrap,
+html[data-theme="dark"] .btn-cancel,
+html[data-theme="dark"] .btn-sm.edit,
+html[data-theme="dark"] .btn-sm.delete {
+  background: #30363d;
+  border-color: #41474f;
+  color: #e7e9ec;
+}
+
+html[data-theme="dark"] .hero-badge,
+html[data-theme="dark"] .hero-img-badge,
+html[data-theme="dark"] .section-title,
+html[data-theme="dark"] .feature-title,
+html[data-theme="dark"] .step-title,
+html[data-theme="dark"] .why-list li,
+html[data-theme="dark"] .footer-brand span {
+  color: #e7e9ec;
+}
+
+html[data-theme="dark"] .why-overlay-card,
+html[data-theme="dark"] .feature-icon,
+html[data-theme="dark"] .step-number {
+  background: #30363d;
+}
+
+html[data-theme="dark"] .empty-state,
+html[data-theme="dark"] .admin-table th {
+  color: #a1a8b0;
+}
+
+html[data-theme="dark"] .admin-table th,
+html[data-theme="dark"] .recipient-preview,
+html[data-theme="dark"] .tab-btn,
+html[data-theme="dark"] .toggle {
+  background: #191c20;
+  border-color: #41474f;
+}
+
+html[data-theme="dark"] .tab-btn {
+  color: #a1a8b0;
+}
+
+html[data-theme="dark"] .toggle.on {
+  background: #68737f;
+}
+
+html[data-theme="dark"] .feature-card:hover {
+  border-color: #a1a8b0;
+}
+
+html[data-theme="dark"] .btn-danger {
+  background: #382729;
+  border-color: #5d363a;
+  color: #ff9a9a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="dark"] *,
+  html[data-theme="dark"] *::before,
+  html[data-theme="dark"] *::after {
+    scroll-behavior: auto;
+  }
+}
