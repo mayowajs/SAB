@@ -69,7 +69,7 @@
 
 .nav-item:hover { background: #1e1e1e; color: #fff; opacity: 1; }
 .nav-item.active { background: #fff; color: #111; font-weight: 700; }
-.nav-item .icon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
+.nav-item .icon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; filter: grayscale(1); }
 .sidebar-logout { margin-top: auto; padding-top: 16px; border-top: 1px solid #222; }
 
 /* ── Main ── */
@@ -162,6 +162,7 @@
   border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
   font-size: 22px;
+  filter: grayscale(1);
 }
 
 .action-btn span { font-size: 12px; font-weight: 700; color: #444; text-align: center; }
@@ -217,7 +218,7 @@
 .tx-amount.received { color: #38a169; }
 
 .empty-state { text-align: center; color: #ccc; padding: 40px 0; font-size: 14px; }
-.empty-state .empty-icon { font-size: 36px; margin-bottom: 10px; }
+.empty-state .empty-icon { font-size: 36px; margin-bottom: 10px; filter: grayscale(1); }
 
 /* ── Bottom Nav (mobile) ── */
 .bottom-nav {
@@ -255,7 +256,7 @@
   min-width: 48px;
 }
 
-.bottom-nav-item .bn-icon { font-size: 22px; line-height: 1; }
+.bottom-nav-item .bn-icon { font-size: 22px; line-height: 1; filter: grayscale(1); }
 .bottom-nav-item.active { color: #111; }
 .bottom-nav-item:hover { color: #111; opacity: 1; }
 
