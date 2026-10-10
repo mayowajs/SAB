@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -102,12 +103,16 @@ router.post('/forgot-password', async (req, res) => {
   try {
     const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
     if (!isValidEmail(email)) return res.status(400).json({ message: 'Enter a valid email address' });
-    if (process.env.NODE_ENV === 'production') {
-      return res.status(503).json({ message: 'Password reset is unavailable' });
+    const isProduction = process.env.NODE_ENV === 'production';
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (isProduction && !resendApiKey) {
+      return res.status(503).json({ message: 'Password reset email is not configured yet' });
     }
 
     const user = await User.findOne({ email });
-    const responseMessage = 'If the account exists, its local demo reset link is shown in the backend terminal.';
+    const responseMessage = isProduction
+      ? 'If the account exists, a password reset link has been sent.'
+      : 'If the account exists, its local demo reset link is shown in the backend terminal.';
     if (!user) return res.json({ message: responseMessage });
 
     const resetToken = crypto.randomBytes(32).toString('hex');
@@ -115,8 +120,34 @@ router.post('/forgot-password', async (req, res) => {
     user.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000);
     await user.save();
 
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/forgot-password?token=${resetToken}`;
-    console.info(`Local demo password reset link: ${resetUrl}`);
+    const frontendUrl = process.env.FRONTEND_URL || (isProduction
+      ? 'https://sab-gbolagade.vercel.app'
+      : 'http://localhost:5173');
+    const resetUrl = `${frontendUrl.replace(/\/+$/, '')}/forgot-password?token=${resetToken}`;
+    if (isProduction) {
+      try {
+        await axios.post('https://api.resend.com/emails', {
+          from: process.env.RESEND_FROM_EMAIL || 'SAB <onboarding@resend.dev>',
+          to: [email],
+          subject: 'Reset your SAB password',
+          html: `<p>We received a request to reset your SAB password.</p><p><a href="${resetUrl}">Reset your password</a></p><p>This link expires in 15 minutes. If you did not request this, you can ignore this email.</p>`,
+          text: `Reset your SAB password: ${resetUrl}\nThis link expires in 15 minutes. If you did not request this, you can ignore this email.`,
+        }, {
+          headers: {
+            Authorization: `Bearer ${resendApiKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      } catch (err) {
+        user.passwordResetTokenHash = null;
+        user.passwordResetExpires = null;
+        await user.save();
+        console.error('Password reset email failed:', err.response?.data?.message || err.message);
+        return res.status(503).json({ message: 'Could not send password reset email right now' });
+      }
+    } else {
+      console.info(`Local demo password reset link: ${resetUrl}`);
+    }
     res.json({ message: responseMessage });
   } catch (err) {
     res.status(500).json({ message: 'Unable to start password reset right now' });

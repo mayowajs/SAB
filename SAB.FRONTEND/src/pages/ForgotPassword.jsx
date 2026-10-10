@@ -16,8 +16,8 @@ export const ForgotPassword = () => {
     setLoading(true);
     try {
       if (!token) {
-        await api.post('/auth/forgot-password', { email: form.email });
-        toast('If the account exists, check the backend terminal for its local reset link.', 'success');
+        const response = await api.post('/auth/forgot-password', { email: form.email });
+        toast(response.message || 'If the account exists, check your email for a reset link.', 'success');
         return;
       }
 
