@@ -31,11 +31,11 @@ export const Login = () => {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo">
+        <Link to="/" className="auth-logo auth-logo-link" aria-label="SAB home">
           <div className="auth-logo-icon">SAB</div>
           <h1>Silver Age Bank</h1>
           <p>Secure · Reliable · Modern</p>
-        </div>
+        </Link>
 
         <h2>Welcome back</h2>
         <p className="subtitle">Sign in to your account</p>

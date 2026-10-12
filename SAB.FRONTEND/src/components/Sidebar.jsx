@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { SERVER_BASE_URL } from '../api';
 import '../styles/dashboard.css';
@@ -22,10 +22,10 @@ export const Sidebar = () => {
     <>
       {/* Desktop Sidebar */}
       <div className="sidebar">
-        <div className="sidebar-logo">
+        <Link to="/" className="sidebar-logo" aria-label="SAB home">
           <div className="sidebar-logo-icon">S</div>
           <div>SAB <span>➤➤</span></div>
-        </div>
+        </Link>
 
         {user?.photo && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 8px', marginBottom: 20 }}>

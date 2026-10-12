@@ -36,11 +36,11 @@ export const Register = () => {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo">
+        <Link to="/" className="auth-logo auth-logo-link" aria-label="SAB home">
           <div className="auth-logo-icon">SAB</div>
           <h1>Silver Age Bank</h1>
           <p>Secure · Reliable · Modern</p>
-        </div>
+        </Link>
 
         <h2>Create account</h2>
         <p className="subtitle">Join SAB and start banking</p>
