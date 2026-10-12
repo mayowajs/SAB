@@ -9,6 +9,13 @@ const router = express.Router();
 
 const PAYSTACK = 'https://api.paystack.co';
 const headers = { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` };
+const escapeHtml = (value) => String(value ?? '—').replace(/[&<>"']/g, (character) => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+}[character]));
 
 // PDF statement download
 router.get('/statement/pdf', auth, async (req, res) => {
@@ -52,6 +59,46 @@ router.get('/statement/pdf', auth, async (req, res) => {
     res.send(html);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+router.get('/:id/receipt', auth, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+
+    const transaction = await Transaction.findById(req.params.id)
+      .populate('sender', 'fullName accountNumber')
+      .populate('receiver', 'fullName accountNumber');
+    if (!canViewTransaction(transaction, req.user.id)) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+
+    const isSent = transaction.sender._id.toString() === req.user.id;
+    const otherParty = isSent ? transaction.receiver : transaction.sender;
+    const recipientName = transaction.type === 'interbank'
+      ? transaction.recipientName
+      : otherParty?.fullName;
+    const recipientAccount = transaction.type === 'interbank'
+      ? transaction.recipientAccount
+      : otherParty?.accountNumber;
+    const safeReference = (transaction.reference || transaction._id.toString()).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const amountPrefix = isSent ? '-' : '+';
+    const partyLabel = isSent ? 'Recipient' : 'Sender';
+    const partyName = isSent ? recipientName : otherParty?.fullName;
+    const partyAccount = isSent ? recipientAccount : otherParty?.accountNumber;
+    const transactionDate = new Date(transaction.createdAt).toLocaleString();
+
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SAB transaction receipt</title><style>
+      *{box-sizing:border-box}body{margin:0;padding:32px;background:#f4f5f6;color:#17191c;font:15px Arial,sans-serif}.receipt{max-width:560px;margin:32px auto;padding:36px;background:#fff;border:1px solid #e4e6e8;border-radius:12px}.brand{font-size:13px;font-weight:700;letter-spacing:1px}.brand-mark{display:inline-grid;place-items:center;width:34px;height:34px;margin-right:8px;border-radius:8px;background:#111;color:#fff}.heading{margin:32px 0 6px;font-size:23px}.status{color:#3d7a59;font-size:13px;font-weight:700}.amount{margin:24px 0;font-size:36px;font-weight:700}.row{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid #eceef0}.label{color:#737980}.value{text-align:right;font-weight:600;overflow-wrap:anywhere}.footer{margin-top:26px;color:#737980;font-size:12px;line-height:1.5}.print{margin-top:20px;padding:10px 16px;border:0;border-radius:7px;background:#17191c;color:#fff;font-size:14px;font-weight:700;cursor:pointer}@media print{body{padding:0;background:#fff}.receipt{margin:0 auto;border:0}.print{display:none}}@media(max-width:480px){body{padding:12px}.receipt{margin:12px auto;padding:24px}}
+    </style></head><body><main class="receipt"><div class="brand"><span class="brand-mark">SAB</span> SILVER AGE BANK</div><h1 class="heading">Transaction receipt</h1><p class="status">${escapeHtml(transaction.status.toUpperCase())}</p><p class="amount">${amountPrefix}₦${Number(transaction.amount).toLocaleString()}</p><div class="row"><span class="label">${partyLabel}</span><span class="value">${escapeHtml(partyName)}</span></div><div class="row"><span class="label">Account</span><span class="value">${escapeHtml(partyAccount)}</span></div>${transaction.type === 'interbank' ? `<div class="row"><span class="label">Bank</span><span class="value">${escapeHtml(transaction.bankName)}</span></div>` : ''}<div class="row"><span class="label">Type</span><span class="value">${transaction.type === 'interbank' ? 'Bank transfer' : 'SAB transfer'}</span></div><div class="row"><span class="label">Note</span><span class="value">${escapeHtml(transaction.note)}</span></div><div class="row"><span class="label">Date</span><span class="value">${escapeHtml(transactionDate)}</span></div><div class="row"><span class="label">Reference</span><span class="value">${escapeHtml(transaction.reference || transaction._id)}</span></div><p class="footer">This receipt confirms the transaction recorded in your SAB account.</p><button class="print" onclick="window.print()">Print / Save as PDF</button></main></body></html>`;
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="SAB_Receipt_${safeReference}.html"`);
+    res.send(html);
+  } catch (err) {
+    res.status(500).json({ message: 'Could not create transaction receipt' });
   }
 });
 

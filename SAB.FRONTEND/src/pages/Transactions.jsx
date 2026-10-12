@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { API_BASE_URL, api } from '../api';
 import { Sidebar } from '../components/Sidebar';
 import '../styles/dashboard.css';
@@ -7,6 +8,7 @@ import '../styles/transfer.css';
 
 export const Transactions = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -14,6 +16,27 @@ export const Transactions = () => {
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [selected, setSelected] = useState(null);
+
+  const handleReceiptDownload = async (transaction) => {
+    try {
+      const token = localStorage.getItem('sab_token');
+      const response = await fetch(`${API_BASE_URL}/transactions/${transaction._id}/receipt`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) {
+        throw new Error('Could not download this receipt');
+      }
+
+      const receiptUrl = URL.createObjectURL(await response.blob());
+      const link = document.createElement('a');
+      link.href = receiptUrl;
+      link.download = `SAB_Receipt_${transaction.reference || transaction._id}.html`;
+      link.click();
+      URL.revokeObjectURL(receiptUrl);
+    } catch (err) {
+      toast(err.message || 'Could not download this receipt', 'error');
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -201,7 +224,8 @@ export const Transactions = () => {
                     </span>
                   </div>
                   <div className="modal-actions">
-                    <button className="btn-primary" onClick={() => setSelected(null)}>Close</button>
+                    <button className="btn-cancel" onClick={() => setSelected(null)}>Close</button>
+                    <button className="btn-primary" onClick={() => handleReceiptDownload(selected)}>Download Receipt</button>
                   </div>
                 </>
               );
