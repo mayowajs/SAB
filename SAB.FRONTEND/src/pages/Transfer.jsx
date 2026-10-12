@@ -79,18 +79,33 @@ export const Transfer = () => {
   // Inter-bank account name lookup
   useEffect(() => {
     setAccountName(''); setAccountNameError('');
-    if (ibForm.accountNumber.length !== 10 || !ibForm.bankCode) return;
-    clearTimeout(ibDebounceRef.current);
+    setVerifying(false);
+    let isCurrentLookup = true;
+    if (ibForm.accountNumber.length !== 10 || !ibForm.bankCode) {
+      return () => { isCurrentLookup = false; };
+    }
+
     ibDebounceRef.current = setTimeout(async () => {
       setVerifying(true);
-      const res = await api.post('/transactions/verify-bank-account', {
-        accountNumber: ibForm.accountNumber,
-        bankCode: ibForm.bankCode,
-      });
-      setVerifying(false);
-      if (res.accountName) setAccountName(res.accountName);
-      else setAccountNameError(res.message || 'Could not verify account');
+      try {
+        const res = await api.post('/transactions/verify-bank-account', {
+          accountNumber: ibForm.accountNumber,
+          bankCode: ibForm.bankCode,
+        });
+        if (!isCurrentLookup) return;
+        if (res.accountName) setAccountName(res.accountName);
+        else setAccountNameError(res.message || 'Could not verify account');
+      } catch (err) {
+        if (isCurrentLookup) setAccountNameError(err.message || 'Could not verify account');
+      } finally {
+        if (isCurrentLookup) setVerifying(false);
+      }
     }, 700);
+
+    return () => {
+      isCurrentLookup = false;
+      clearTimeout(ibDebounceRef.current);
+    };
   }, [ibForm.accountNumber, ibForm.bankCode]);
 
   const handleBankChange = (e) => {
