@@ -245,6 +245,9 @@ router.post('/interbank-transfer', auth, async (req, res) => {
     }
 
     const sender = await User.findById(req.user.id);
+    if (sender?.isAdmin) {
+      return res.status(403).json({ message: 'Admin demo funds can only be used for SAB-to-SAB transfers' });
+    }
     if (sender.balance < amount) return res.status(400).json({ message: 'Insufficient balance' });
 
     const ref = 'SAB' + Date.now() + Math.floor(Math.random() * 1000);

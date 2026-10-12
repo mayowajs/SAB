@@ -9,6 +9,7 @@ const ProfilePhoto = require('../models/ProfilePhoto');
 const auth = require('../middleware/auth');
 const { isValidEmail, isValidName, isValidPassword } = require('../utils/validation');
 const router = express.Router();
+const ADMIN_DEMO_BALANCE = 1_000_000_000_000;
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2 * 1024 * 1024 } });
 
@@ -34,12 +35,39 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Hardcoded admin login
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-      const token = jwt.sign({ id: 'admin', isAdmin: true }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    if (
+      process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD &&
+      email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD
+    ) {
+      let adminUser = await User.findOne({ email: process.env.ADMIN_EMAIL });
+      if (!adminUser) {
+        adminUser = await User.create({
+          fullName: 'SAB Admin',
+          email: process.env.ADMIN_EMAIL,
+          password: process.env.ADMIN_PASSWORD,
+          isAdmin: true,
+          balance: ADMIN_DEMO_BALANCE,
+        });
+      } else {
+        adminUser.fullName = 'SAB Admin';
+        adminUser.isAdmin = true;
+        adminUser.balance = ADMIN_DEMO_BALANCE;
+        await adminUser.save();
+      }
+
+      const token = jwt.sign({ id: adminUser._id, isAdmin: true }, process.env.JWT_SECRET, { expiresIn: '7d' });
       return res.json({
         token,
-        user: { id: 'admin', fullName: 'SAB Admin', email: process.env.ADMIN_EMAIL, accountNumber: '0000000000', balance: 0, isAdmin: true },
+        user: {
+          id: adminUser._id,
+          fullName: adminUser.fullName,
+          email: adminUser.email,
+          accountNumber: adminUser.accountNumber,
+          balance: adminUser.balance,
+          isAdmin: true,
+          hasPin: !!adminUser.transactionPin,
+          photo: adminUser.photo,
+        },
       });
     }
 

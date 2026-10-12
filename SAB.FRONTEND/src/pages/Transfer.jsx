@@ -41,10 +41,11 @@ export const Transfer = () => {
 
   // Load banks once
   useEffect(() => {
+    if (user.isAdmin) return;
     api.get('/transactions/banks').then((data) => {
       if (Array.isArray(data)) setBanks(data);
     });
-  }, []);
+  }, [user.isAdmin]);
 
   // SAB name search
   useEffect(() => {
@@ -134,21 +135,26 @@ export const Transfer = () => {
 
   // Confirm SAB transfer
   const handleSabConfirm = async () => {
-    const res = await api.post('/transactions/transfer', {
-      accountNumber: sabForm.accountNumber,
-      amount: Number(sabForm.amount),
-      note: sabForm.note,
-    });
-    setLoading(false);
-    if (res.message === 'Transfer successful') {
-      updateUser({ ...user, balance: res.balance });
-      setReceipt({ ...res.transaction, recipientName: recipient.fullName, recipientAccount: recipient.accountNumber, type: 'internal' });
-      // Auto-save beneficiary
-      api.post('/auth/beneficiaries', { fullName: recipient.fullName, accountNumber: recipient.accountNumber }).catch(() => {});
-      setSabForm({ accountNumber: '', amount: '', note: '' });
-      setRecipient(null);
-    } else {
-      toast(res.message || 'Transfer failed', 'error');
+    setLoading(true);
+    try {
+      const res = await api.post('/transactions/transfer', {
+        accountNumber: sabForm.accountNumber,
+        amount: Number(sabForm.amount),
+        note: sabForm.note,
+      });
+      if (res.message === 'Transfer successful') {
+        updateUser({ ...user, balance: res.balance });
+        setReceipt({ ...res.transaction, recipientName: recipient.fullName, recipientAccount: recipient.accountNumber, type: 'internal' });
+        api.post('/auth/beneficiaries', { fullName: recipient.fullName, accountNumber: recipient.accountNumber }).catch(() => {});
+        setSabForm({ accountNumber: '', amount: '', note: '' });
+        setRecipient(null);
+      } else {
+        toast(res.message || 'Transfer failed', 'error');
+      }
+    } catch (err) {
+      toast(err.message || 'Transfer failed', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -200,8 +206,12 @@ export const Transfer = () => {
         {/* Tabs */}
         <div className="transfer-tabs">
           <button className={tab === 'sab' ? 'active' : ''} onClick={() => setTab('sab')}>SAB to SAB</button>
-          <button className={tab === 'interbank' ? 'active' : ''} onClick={() => setTab('interbank')}>Other Banks</button>
+          {!user.isAdmin && (
+            <button className={tab === 'interbank' ? 'active' : ''} onClick={() => setTab('interbank')}>Other Banks</button>
+          )}
         </div>
+
+        {user.isAdmin && <p className="field-hint">Presentation wallet: virtual funds for SAB-to-SAB transfers only. Balance refills when you sign in.</p>}
 
         <div className="section-card" style={{ maxWidth: 500 }}>
 
@@ -339,7 +349,16 @@ export const Transfer = () => {
             <div className="modal-actions">
               <button className="btn-cancel" onClick={() => setShowConfirm(false)}>Cancel</button>
               <button className="btn-primary" style={{ width: 'auto' }}
-                onClick={() => { setShowConfirm(false); setPinValue(''); setPinError(''); setShowPin(true); }}>
+                onClick={() => {
+                  setShowConfirm(false);
+                  if (user.isAdmin) {
+                    handleSabConfirm();
+                    return;
+                  }
+                  setPinValue('');
+                  setPinError('');
+                  setShowPin(true);
+                }}>
                 Continue
               </button>
             </div>
