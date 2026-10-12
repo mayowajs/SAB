@@ -102,6 +102,10 @@ html[data-theme="dark"] .nav-item.active {
   color: #fff;
 }
 
+html[data-theme="dark"] .nav-item.active .icon {
+  filter: grayscale(1) brightness(0) invert(1);
+}
+
 html[data-theme="dark"] .nav-item:hover,
 html[data-theme="dark"] .admin-table tr:hover td {
   background: #2b3036;
@@ -110,6 +114,15 @@ html[data-theme="dark"] .admin-table tr:hover td {
 html[data-theme="dark"] .bottom-nav {
   background: #202429;
   border-color: #343a40;
+}
+
+html[data-theme="dark"] .bottom-nav-item.active,
+html[data-theme="dark"] .bottom-nav-item:hover {
+  color: #fff;
+}
+
+html[data-theme="dark"] .bottom-nav-item .bn-icon {
+  filter: grayscale(1) brightness(0) invert(1);
 }
 
 html[data-theme="dark"] .balance-card,
@@ -199,6 +212,10 @@ html[data-theme="dark"] .footer-brand span {
 html[data-theme="dark"] .why-overlay-card,
 html[data-theme="dark"] .feature-icon,
 html[data-theme="dark"] .step-number {
+  background: #30363d;
+}
+
+html[data-theme="dark"] .action-icon-wrap {
   background: #30363d;
 }
 

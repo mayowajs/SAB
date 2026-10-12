@@ -98,19 +98,19 @@ export const Dashboard = () => {
         {/* Quick Actions */}
         <div className="quick-actions">
           <Link to="/transfer" className="action-btn">
-            <div className="action-icon-wrap">💸</div>
+            <div className="action-icon-wrap"><span className="action-icon">💸</span></div>
             <span>Transfer</span>
           </Link>
           <Link to="/transactions" className="action-btn">
-            <div className="action-icon-wrap">📋</div>
+            <div className="action-icon-wrap"><span className="action-icon">📋</span></div>
             <span>History</span>
           </Link>
           <Link to="/card" className="action-btn">
-            <div className="action-icon-wrap">💳</div>
+            <div className="action-icon-wrap"><span className="action-icon">💳</span></div>
             <span>My Card</span>
           </Link>
           <Link to="/settings" className="action-btn">
-            <div className="action-icon-wrap">⚙️</div>
+            <div className="action-icon-wrap"><span className="action-icon">⚙️</span></div>
             <span>Settings</span>
           </Link>
         </div>
