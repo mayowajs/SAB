@@ -70,22 +70,22 @@ export const Admin = () => {
         {/* Stats */}
         <div className="admin-stats">
           <div className="stat-card">
-            <div className="stat-icon">👥</div>
+            <div className="stat-icon"><span>👥</span></div>
             <div className="stat-value">{users.length}</div>
             <div className="stat-label">Total Users</div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">📋</div>
+            <div className="stat-icon"><span>📋</span></div>
             <div className="stat-value">{totalTx}</div>
             <div className="stat-label">Transactions</div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">💰</div>
+            <div className="stat-icon"><span>💰</span></div>
             <div className="stat-value">₦{totalVolume.toLocaleString()}</div>
             <div className="stat-label">Total Volume</div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">🏦</div>
+            <div className="stat-icon"><span>🏦</span></div>
             <div className="stat-value">₦{totalBalance.toLocaleString()}</div>
             <div className="stat-label">Total Deposits</div>
           </div>
