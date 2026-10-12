@@ -4,17 +4,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const multer = require('multer');
-const path = require('path');
 const User = require('../models/User');
+const ProfilePhoto = require('../models/ProfilePhoto');
 const auth = require('../middleware/auth');
 const { isValidEmail, isValidName, isValidPassword } = require('../utils/validation');
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination: path.join(__dirname, '../uploads'),
-  filename: (req, file, cb) => cb(null, `${req.user?.id || Date.now()}${path.extname(file.originalname)}`),
-});
-const upload = multer({ storage, limits: { fileSize: 2 * 1024 * 1024 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2 * 1024 * 1024 } });
 
 router.post('/register', async (req, res) => {
   try {
@@ -91,6 +87,7 @@ router.patch('/password', auth, async (req, res) => {
 
 router.delete('/account', auth, async (req, res) => {
   try {
+    await ProfilePhoto.deleteOne({ user: req.user.id });
     await User.findByIdAndDelete(req.user.id);
     res.json({ message: 'Account deleted' });
   } catch (err) {
@@ -182,11 +179,36 @@ router.post('/reset-password', async (req, res) => {
 router.post('/upload-photo', auth, upload.single('photo'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-    const photoUrl = `/uploads/${req.file.filename}`;
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(req.file.mimetype)) {
+      return res.status(400).json({ message: 'Upload a JPEG, PNG, WebP, or GIF image' });
+    }
+
+    const photoUrl = `/api/auth/photo/${req.user.id}`;
+    await ProfilePhoto.findOneAndUpdate(
+      { user: req.user.id },
+      { contentType: req.file.mimetype, data: req.file.buffer },
+      { upsert: true, new: true, runValidators: true }
+    );
     await User.findByIdAndUpdate(req.user.id, { photo: photoUrl });
     res.json({ photoUrl });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+router.get('/photo/:userId', async (req, res) => {
+  try {
+    if (!/^[a-f\d]{24}$/i.test(req.params.userId)) {
+      return res.status(400).json({ message: 'Invalid photo reference' });
+    }
+
+    const photo = await ProfilePhoto.findOne({ user: req.params.userId }).select('contentType data');
+    if (!photo) return res.status(404).json({ message: 'Profile photo not found' });
+
+    res.set('Cache-Control', 'no-store');
+    res.type(photo.contentType).send(photo.data);
+  } catch (err) {
+    res.status(500).json({ message: 'Could not load profile photo' });
   }
 });
 

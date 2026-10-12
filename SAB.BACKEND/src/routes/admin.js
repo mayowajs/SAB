@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../models/User');
+const ProfilePhoto = require('../models/ProfilePhoto');
 const Transaction = require('../models/Transaction');
 const auth = require('../middleware/auth');
 const router = express.Router();
@@ -62,6 +63,7 @@ router.patch('/users/:id/freeze', auth, adminOnly, async (req, res) => {
 // Delete user
 router.delete('/users/:id', auth, adminOnly, async (req, res) => {
   try {
+    await ProfilePhoto.deleteOne({ user: req.params.id });
     await User.findByIdAndDelete(req.params.id);
     res.json({ message: 'User deleted' });
   } catch (err) {

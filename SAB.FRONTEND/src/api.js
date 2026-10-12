@@ -1,5 +1,10 @@
 ﻿export const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
 export const SERVER_BASE_URL = API_BASE_URL.replace(/\/api$/, '');
+export const getProfilePhotoSrc = (photo) => {
+  if (!photo) return '';
+  if (/^(data:|https?:\/\/)/i.test(photo)) return photo;
+  return `${SERVER_BASE_URL}${photo}`;
+};
 const getToken = () => localStorage.getItem('sab_token');
 
 const request = async (path, options = {}) => {
