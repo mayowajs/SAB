@@ -6,7 +6,7 @@ const themeOptions = ['system', 'light', 'dark'];
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('sab_theme');
-    return themeOptions.includes(savedTheme) ? savedTheme : 'system';
+    return themeOptions.includes(savedTheme) ? savedTheme : 'light';
   });
 
   useEffect(() => {
