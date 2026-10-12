@@ -24,7 +24,8 @@ export const Landing = () => {
       <nav className="landing-nav">
         <Link to="/" className="landing-nav-logo">
           <div className="landing-nav-logo-icon">SAB</div>
-          Silver Age Bank <span>➤➤</span>
+          <span className="landing-nav-wordmark">Silver Age Bank</span>
+          <span className="landing-nav-arrow" aria-hidden="true">➤➤</span>
         </Link>
         <div className="landing-nav-links">
           <a href="#features">Features</a>

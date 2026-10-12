@@ -584,8 +584,15 @@
 }
 
 @media (max-width: 768px) {
-  .landing-nav { padding: 16px 20px; }
+  .landing-nav { padding: 12px 16px; gap: 10px; }
   .landing-nav-links { display: none; }
+  .landing-nav-logo { gap: 8px; font-size: 16px; white-space: nowrap; flex-shrink: 0; }
+  .landing-nav-logo-icon { width: 32px; height: 32px; font-size: 11px; border-radius: 8px; }
+  .landing-nav-wordmark { white-space: nowrap; }
+  .landing-nav-actions { gap: 6px; flex-shrink: 0; }
+  .landing-nav-actions .btn-outline,
+  .landing-nav-actions .btn-solid { padding: 8px 10px; font-size: 12px; line-height: 1.2; white-space: nowrap; }
+  .landing-nav-arrow { display: none; }
   .hero { padding: 100px 20px 60px; }
   .hero-content { grid-template-columns: 1fr; gap: 40px; }
   .hero-title { font-size: 36px; }
@@ -609,6 +616,12 @@
 }
 
 @media (max-width: 480px) {
+  .landing-nav { padding-right: 12px; padding-left: 12px; }
+  .landing-nav-logo { gap: 6px; font-size: 14px; }
+  .landing-nav-logo-icon { width: 30px; height: 30px; font-size: 10px; }
+  .landing-nav-actions { gap: 5px; }
+  .landing-nav-actions .btn-outline,
+  .landing-nav-actions .btn-solid { padding: 8px; font-size: 11px; }
   .hero-title { font-size: 30px; }
   .steps-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
