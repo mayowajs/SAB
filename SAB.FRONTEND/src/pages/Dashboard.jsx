@@ -25,9 +25,9 @@ export const Dashboard = () => {
     }).catch(() => setLoadingTx(false));
   }, []);
 
-  const formatAmount = (tx) => {
-    const isSent = tx.sender._id === user.id || tx.sender.id === user.id;
-    return { amount: tx.amount, type: isSent ? 'sent' : 'received' };
+  const isSent = (tx) => {
+    const senderId = tx.sender?._id ?? tx.sender?.id ?? tx.sender;
+    return String(senderId) === String(user.id);
   };
 
   return (
@@ -141,8 +141,10 @@ export const Dashboard = () => {
             </div>
           ) : (
             transactions.map((tx) => {
-              const { amount, type } = formatAmount(tx);
-              const other = type === 'sent' ? tx.receiver : tx.sender;
+              const sent = isSent(tx);
+              const type = sent ? 'sent' : 'received';
+              const other = sent ? tx.receiver : tx.sender;
+              const otherName = other?.fullName || (sent ? tx.recipientName : null) || 'Account unavailable';
               return (
                 <div key={tx._id} className="tx-item">
                   <div className="tx-left">
@@ -150,7 +152,7 @@ export const Dashboard = () => {
                       {type === 'sent' ? '↑' : '↓'}
                     </div>
                     <div>
-                      <p className="tx-name">{other.fullName}</p>
+                      <p className="tx-name">{otherName}</p>
                       <p className="tx-date">{new Date(tx.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>

@@ -49,19 +49,24 @@ export const Transactions = () => {
     });
   }, [page, search]);
 
+  const belongsToUser = (participant) => {
+    const participantId = participant?._id ?? participant?.id ?? participant;
+    return String(participantId) === String(user.id);
+  };
+
   const filtered = transactions.filter((tx) => {
-    const isSent = tx.sender._id === user.id || tx.sender.id === user.id;
+    const isSent = belongsToUser(tx.sender);
     if (filter === 'sent') return isSent;
     if (filter === 'received') return !isSent;
     return true;
   });
 
   const totalSent = transactions
-    .filter((tx) => tx.sender._id === user.id || tx.sender.id === user.id)
+    .filter((tx) => belongsToUser(tx.sender))
     .reduce((s, tx) => s + tx.amount, 0);
 
   const totalReceived = transactions
-    .filter((tx) => tx.receiver._id === user.id || tx.receiver.id === user.id)
+    .filter((tx) => belongsToUser(tx.receiver))
     .reduce((s, tx) => s + tx.amount, 0);
 
   return (
@@ -134,15 +139,16 @@ export const Transactions = () => {
             <div className="empty-state"><div className="empty-icon">📭</div><p>No transactions found</p></div>
           ) : (
             filtered.map((tx) => {
-              const isSent = tx.sender._id === user.id || tx.sender.id === user.id;
+              const isSent = belongsToUser(tx.sender);
               const type = isSent ? 'sent' : 'received';
               const other = isSent ? tx.receiver : tx.sender;
+              const otherName = other?.fullName || (isSent ? tx.recipientName : null) || 'Account unavailable';
               return (
                 <div key={tx._id} className="tx-item" style={{ cursor: 'pointer' }} onClick={() => setSelected(tx)}>
                   <div className="tx-left">
                     <div className={`tx-icon ${type}`}>{isSent ? '↑' : '↓'}</div>
                     <div>
-                      <p className="tx-name">{other.fullName}</p>
+                      <p className="tx-name">{otherName}</p>
                       <p className="tx-date">
                         {new Date(tx.createdAt).toLocaleDateString()} · {tx.note || 'No note'}
                       </p>
@@ -187,8 +193,9 @@ export const Transactions = () => {
         <div className="modal-overlay" onClick={() => setSelected(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             {(() => {
-              const isSent = selected.sender._id === user.id || selected.sender.id === user.id;
-              const type = isSent ? 'sent' : 'received';
+              const isSent = belongsToUser(selected.sender);
+              const senderName = selected.sender?.fullName || 'Account unavailable';
+              const recipientName = selected.receiver?.fullName || selected.recipientName || 'Account unavailable';
               return (
                 <>
                   <div className="receipt-icon">{isSent ? '💸' : '💰'}</div>
@@ -203,12 +210,18 @@ export const Transactions = () => {
                   </div>
                   <div className="modal-row">
                     <label>From</label>
-                    <span>{selected.sender.fullName}</span>
+                    <span>{senderName}</span>
                   </div>
                   <div className="modal-row">
                     <label>To</label>
-                    <span>{selected.receiver.fullName}</span>
+                    <span>{recipientName}</span>
                   </div>
+                  {selected.type === 'interbank' && selected.bankName && (
+                    <div className="modal-row">
+                      <label>Bank</label>
+                      <span>{selected.bankName}</span>
+                    </div>
+                  )}
                   <div className="modal-row">
                     <label>Note</label>
                     <span>{selected.note || '—'}</span>
