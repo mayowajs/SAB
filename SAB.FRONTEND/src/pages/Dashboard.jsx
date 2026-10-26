@@ -143,6 +143,7 @@ export const Dashboard = () => {
             transactions.map((tx) => {
               const sent = isSent(tx);
               const type = sent ? 'sent' : 'received';
+              const amount = tx.amount;
               const other = sent ? tx.receiver : tx.sender;
               const otherName = other?.fullName || (sent ? tx.recipientName : null) || 'Account unavailable';
               return (
